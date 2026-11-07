@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Nexus Core — an AI multi-cloud operations command center demo: deployments, live debugging, security radar and 24-hour reports.">
+<title>Nexus Core · AI Multi-Cloud Command Center</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23070d18'/%3E%3Cpath d='M16 4 26 9.5v13L16 28 6 22.5v-13z' fill='none' stroke='%2338d9ff' stroke-width='1.7'/%3E%3Cpath d='M12 21V11l8 10V11' fill='none' stroke='%2338d9ff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="30" height="30">
+          <defs>
+            <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#5ee7ff"/><stop offset="1" stop-color="#3b82f6"/>
+            </linearGradient>
+          </defs>
+          <path d="M16 2.5 27 8.5v15L16 29.5 5 23.5v-15z" fill="none" stroke="url(#brandGrad)" stroke-width="1.5"/>
+          <path d="M11 21V11l10 10V11" fill="none" stroke="url(#brandGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <strong>NEXUS<span>CORE</span></strong>
+        <small>Multi-cloud AIOps</small>
+      </div>
+    </div>
+
+    <nav class="nav" id="sidebarNav" aria-label="Sections">
+      <button class="nav-item is-active" data-view="command" title="Command Center">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+        <span class="nav-label">Command Center</span><span class="nav-key">1</span>
+      </button>
+      <button class="nav-item" data-view="deploy" title="Deployment Hub">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3.2 1.9 4.5 5.2 4.5 8.5L12 16l-4.5-4.5C7.5 8.2 8.8 4.9 12 3z"/><circle cx="12" cy="9" r="1.6"/><path d="M9.6 16.4 8 20l3-1M14.4 16.4 16 20l-3-1"/></svg>
+        <span class="nav-label">Deployment Hub</span><span class="nav-key">2</span>
+      </button>
+      <button class="nav-item" data-view="debug" title="Live Debugger">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="4"/><path d="M12 9V6M9 7.5 7 5.5M15 7.5l2-2M8 13H4M16 13h4M9 16l-2 3M15 16l2 3"/></svg>
+        <span class="nav-label">Live Debugger</span><span class="nav-key">3</span>
+      </button>
+      <button class="nav-item" data-view="shield" title="Aegis Shield">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+        <span class="nav-label">Aegis Shield</span><span class="nav-key">4</span>
+      </button>
+      <button class="nav-item" data-view="analytics" title="Analytics &amp; Reports" aria-label="Analytics and reports">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V4M4 20h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/></svg>
+        <span class="nav-label">Analytics</span><span class="nav-key">5</span>
+      </button>
+      <button class="nav-item" data-view="gateway" title="AI Gateway & Evals">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h4m8 0h4M12 4v4m0 8v4M8 8h8v8H8z"/><circle cx="12" cy="12" r="1.5"/></svg>
+        <span class="nav-label">AI Gateway &amp; Evals</span><span class="nav-key">7</span>
+      </button>
+      <button class="nav-item" data-view="settings" title="Cloud Registry">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.5 1.5M16.9 16.9l1.5 1.5M18.4 5.6l-1.5 1.5M7.1 16.9l-1.5 1.5"/></svg>
+        <span class="nav-label">Cloud Registry</span><span class="nav-key">6</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="agent-card">
+        <div class="agent-head"><span class="dot live"></span><strong>Jarvis AI</strong><span class="pill ok tiny">Online</span></div>
+        <div class="agent-meta">Monitoring 10 apps · 3 clouds</div>
+        <div class="agent-bars" aria-hidden="true">
+          <i style="--h:38%"></i><i style="--h:62%"></i><i style="--h:48%"></i><i style="--h:82%"></i><i style="--h:56%"></i><i style="--h:70%"></i><i style="--h:94%"></i><i style="--h:64%"></i>
+        </div>
+      </div>
+      <div class="sidebar-note"><span class="dot" style="background:#5f7898"></span> v0.9 · demo build</div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn menu-btn" id="menuBtn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebarNav">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <div class="page-id">
+          <div class="crumb">ops / <span id="crumbView">command center</span></div>
+          <h1 id="pageTitle">Global command center</h1>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="cloud-health" aria-label="Cloud provider status">
+          <span class="ch-chip"><i class="dot gcp"></i>GCP</span>
+          <span class="ch-chip"><i class="dot azure"></i>Azure</span>
+          <span class="ch-chip"><i class="dot aws"></i>AWS</span>
+        </div>
+        <span class="pill sim-chip" title="Demo environment">● simulated</span>
+        <button class="icon-btn" id="infoBtn" aria-label="How this demo works" title="How this demo works">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.2"/></svg>
+        </button>
+        <div class="bell-wrap">
+          <button class="icon-btn bell" id="bellBtn" aria-label="Notifications" aria-expanded="false">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M18 15H6l1.4-2.1V10a4.6 4.6 0 0 1 9.2 0v2.9z"/><path d="M10.4 18a1.7 1.7 0 0 0 3.2 0"/></svg>
+            <span class="badge" id="bellBadge">3</span>
+          </button>
+          <div class="notif-panel" id="notifPanel" hidden>
+            <div class="notif-head"><strong>Notifications</strong><span class="pill warn tiny">3 new</span></div>
+            <button class="notif-item" data-target="shield">
+              <span class="notif-ic rose">!</span>
+              <span><strong>Intrusion contained</strong><em>AeroFleet moved AWS → Azure · 0 downtime</em><small>4 min ago</small></span>
+            </button>
+            <button class="notif-item" data-target="analytics">
+              <span class="notif-ic amber">★</span>
+              <span><strong>Review cluster detected</strong><em>34 complaints about OTP delivery on LedgerPay</em><small>52 min ago</small></span>
+            </button>
+            <button class="notif-item" data-target="analytics">
+              <span class="notif-ic cyan">▤</span>
+              <span><strong>24-hour report ready</strong><em>Downloads, sentiment and crash digest</em><small>Today, 06:00 IST</small></span>
+            </button>
+            <div class="notif-foot">View all activity</div>
+          </div>
+        </div>
+        <div class="avatar" title="Signed in as Admin">A</div>
+      </div>
+    </header>
+
+    <div class="sim-strip" id="simStrip">
+      <span class="sim-strip-ic">i</span>
+      <p><strong>Demo environment.</strong> Every metric on this dashboard is generated in your browser — no cloud account is connected and no data leaves this page.</p>
+      <button class="link-btn" id="simMore">What’s simulated?</button>
+      <button class="icon-btn tiny" id="simClose" aria-label="Dismiss notice">✕</button>
+    </div>
+
+    <main class="content" id="content">
+
+      <!-- ================= COMMAND CENTER ================= -->
+      <section class="view is-active" id="view-command" aria-label="Command center">
+        <div class="metrics">
+          <article class="card metric">
+            <div class="metric-head"><span class="metric-label">Apps deployed</span><span class="metric-glyph">▦</span></div>
+            <div class="metric-value"><span data-count="10">0</span><span class="metric-unit"> / 10</span></div>
+            <div class="metric-foot"><span class="delta up">▲ 2 this week</span><span>9 healthy · 1 building</span></div>
+            <div class="spark" data-spark="apps"></div>
+          </article>
+          <article class="card metric">
+            <div class="metric-head"><span class="metric-label">Live users</span><span class="metric-glyph">◉</span></div>
+            <div class="metric-value"><span id="liveUsers">128,870</span></div>
+            <div class="metric-foot"><span class="delta up">▲ 4.8%</span><span>vs. 1h ago</span></div>
+            <div class="spark" data-spark="users"></div>
+          </article>
+          <article class="card metric">
+            <div class="metric-head"><span class="metric-label">Downloads · 24h</span><span class="metric-glyph">↓</span></div>
+            <div class="metric-value"><span data-count="18420">0</span></div>
+            <div class="metric-foot"><span class="delta up">▲ 12.4%</span><span>vs. yesterday</span></div>
+            <div class="spark" data-spark="downloads"></div>
+          </article>
+          <article class="card metric">
+            <div class="metric-head"><span class="metric-label">Threats blocked · 24h</span><span class="metric-glyph rose">⚠</span></div>
+            <div class="metric-value"><span id="threatMetric" data-count="47">0</span></div>
+            <div class="metric-foot"><span class="delta flat">1 auto-migration</span><span>0 breaches</span></div>
+            <div class="spark" data-spark="threats" data-tone="rose"></div>
+          </article>
+        </div>
+
+        <div class="gateway-shortcut card"><div><span class="gateway-eyebrow">NEW · INTELLIGENCE LAYER</span><strong>Route smarter. Evaluate with evidence.</strong><p>Explore the AI gateway, reliability controls and agent evaluation lab.</p></div><button class="btn primary" data-goto="gateway">Open AI Gateway →</button></div>
+        <div class="grid-command">
+          <section class="card panel map-panel">
+            <div class="panel-head">
+              <div><h2>Global footprint</h2><p class="panel-sub">Apps and live traffic across providers</p></div>
+              <div class="panel-tools">
+                <span class="pill sim tiny">SIM</span>
+                <div class="legend">
+                  <span><i class="dot gcp"></i>GCP</span>
+                  <span><i class="dot azure"></i>Azure</span>
+                  <span><i class="dot aws"></i>AWS</span>
+                </div>
+              </div>
+            </div>
+            <div class="map-wrap">
+              <svg id="worldMap" class="map-svg" viewBox="0 0 528 240" role="img" aria-label="World map with simulated cloud regions"></svg>
+            </div>
+            <div class="map-stats">
+              <div><span>Regions online</span><strong>9 / 9</strong></div>
+              <div><span>Avg. latency</span><strong>61 ms</strong></div>
+              <div><span>Traffic</span><strong>4.2 Gbps</strong></div>
+              <div><span>Replication lag</span><strong class="mint">0.8 s</strong></div>
+            </div>
+          </section>
+
+          <section class="card panel terminal-panel">
+            <div class="panel-head">
+              <div><h2>Jarvis · live feed</h2><p class="panel-sub">Synthetic events, generated locally</p></div>
+              <div class="panel-tools">
+                <button class="btn xs ghost" id="pauseLog">Pause</button>
+                <button class="btn xs ghost" id="clearLog">Clear</button>
+              </div>
+            </div>
+            <div class="terminal" id="terminal" aria-label="Jarvis activity log"></div>
+            <form class="term-input" id="termForm" autocomplete="off">
+              <span class="term-prompt">jarvis@nexus ~ $</span>
+              <input id="termInput" type="text" placeholder="Try /help" aria-label="Jarvis command">
+              <button class="btn xs" type="submit">Run</button>
+            </form>
+          </section>
+        </div>
+
+        <section class="card panel apps-panel">
+          <div class="panel-head">
+            <div><h2>App array</h2><p class="panel-sub"><span id="appCount">10</span> apps across 3 providers</p></div>
+            <div class="panel-tools">
+              <div class="filter-chips" role="group" aria-label="Filter apps">
+                <button class="chip is-active" data-filter="all">All</button>
+                <button class="chip" data-filter="healthy">Healthy</button>
+                <button class="chip" data-filter="attention">Attention</button>
+              </div>
+              <button class="btn primary xs" data-goto="deploy">+ Deploy app</button>
+            </div>
+          </div>
+          <div class="apps-grid" id="appsGrid"></div>
+        </section>
+
+        <div class="grid-two">
+          <section class="card panel">
+            <div class="panel-head">
+              <div><h2>Last 24 hours</h2><p class="panel-sub">Daily digest · 06:00 IST</p></div>
+              <button class="btn xs ghost" data-goto="analytics">Full report →</button>
+            </div>
+            <div class="digest">
+              <div class="digest-row"><span class="digest-ic cyan">↓</span><div><strong>18,420</strong><span>Downloads</span></div><span class="delta up">▲ 12.4%</span></div>
+              <div class="digest-row"><span class="digest-ic mint">★</span><div><strong>1,286</strong><span>New reviews · 4.4 avg</span></div><span class="delta up">▲ 3.1%</span></div>
+              <div class="digest-row"><span class="digest-ic violet">◈</span><div><strong>99.2%</strong><span>Crash-free sessions</span></div><span class="delta flat">▼ 0.2%</span></div>
+              <div class="digest-row"><span class="digest-ic rose">!</span><div><strong>147</strong><span>Negative reviews</span></div><span class="delta flat">8.4% of total</span></div>
+            </div>
+            <div class="mini-bars" id="digestBars" aria-label="Downloads, last seven days"></div>
+            <button class="btn wide" id="downloadReportMini">Export 24h report (CSV)</button>
+          </section>
+
+          <section class="card panel">
+            <div class="panel-head">
+              <div><h2>AI recommendations</h2><p class="panel-sub">Ranked by projected impact</p></div>
+              <span class="pill tiny">3 open</span>
+            </div>
+            <div class="reco-list">
+              <div class="reco">
+                <span class="reco-ic amber">▲</span>
+                <div><strong>Shift ShieldScan off eu-central-1</strong><p>p95 latency is 2.4× baseline during EU peak. Azure westeurope has capacity headroom.</p><button class="btn xs ghost" data-reco>Stage change</button></div>
+              </div>
+              <div class="reco">
+                <span class="reco-ic rose">★</span>
+                <div><strong>Fix OTP delivery on LedgerPay</strong><p>34 negative reviews in 6h cluster around “OTP not received”. Suggested: SMS fallback + retry at 20s.</p><button class="btn xs ghost" data-reco>Create patch</button></div>
+              </div>
+              <div class="reco">
+                <span class="reco-ic cyan">◈</span>
+                <div><strong>Raise Redis TTL to 900s</strong><p>Cache hit rate is 71% on OrbitNotes. Simulated projection: −180 ms p50, −14% DB reads.</p><button class="btn xs ghost" data-reco>Apply</button></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- ================= DEPLOYMENT HUB ================= -->
+      <section class="view" id="view-deploy" aria-label="Deployment hub">
+        <div class="grid-deploy">
+          <section class="card panel">
+            <div class="panel-head">
+              <div><h2>Deploy a new app</h2><p class="panel-sub">Build, test, scan, ship</p></div>
+              <span class="pill sim tiny">SIM</span>
+            </div>
+            <div class="field"><label for="depName">App name</label><input id="depName" type="text" value="NexusSandbox11" spellcheck="false"></div>
+            <div class="field"><label for="depRepo">Source</label><input id="depRepo" type="text" value="github.com/you/nexus-sandbox" spellcheck="false"></div>
+
+            <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Add a build artifact (demo only)">
+              <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19v-3"/></svg>
+              <strong>Drop a ZIP or build artifact</strong>
+              <small id="dropHint">Files never leave your browser</small>
+            </div>
+
+            <fieldset class="cloud-pick">
+              <legend>Target cloud</legend>
+              <label class="cloud-opt is-checked">
+                <input type="radio" name="cloud" value="GCP" checked>
+                <span class="cloud-opt-body"><i class="dot gcp"></i><strong>Google Cloud</strong><small>asia-south1</small></span>
+              </label>
+              <label class="cloud-opt">
+                <input type="radio" name="cloud" value="Azure">
+                <span class="cloud-opt-body"><i class="dot azure"></i><strong>Microsoft Azure</strong><small>centralindia</small></span>
+              </label>
+              <label class="cloud-opt">
+                <input type="radio" name="cloud" value="AWS">
+                <span class="cloud-opt-body"><i class="dot aws"></i><strong>AWS</strong><small>ap-south-1</small></span>
+              </label>
+            </fieldset>
+
+            <div class="field">
+              <label for="regionSelect">Region</label>
+              <select id="regionSelect"></select>
+            </div>
+
+            <div class="switch-row">
+              <label class="switch"><input type="checkbox" checked data-gate="build"><span class="track"></span><span>Container build</span></label>
+              <label class="switch"><input type="checkbox" checked data-gate="test"><span class="track"></span><span>Automated tests</span></label>
+              <label class="switch"><input type="checkbox" checked data-gate="scan"><span class="track"></span><span>Security scan</span></label>
+            </div>
+
+            <button class="btn primary wide" id="deployBtn">Deploy to <span id="targetLabel">Google Cloud</span></button>
+            <p class="fine">Runs a local animation. Nothing is uploaded, provisioned or billed.</p>
+          </section>
+
+          <section class="card panel pipeline-panel">
+            <div class="panel-head">
+              <div><h2>Live pipeline</h2><p class="panel-sub">Synthetic build log</p></div>
+              <span class="pill" id="pipeStatus">idle</span>
+            </div>
+            <ol class="steps" id="pipelineSteps"></ol>
+            <div class="deploy-log" id="deployLog"><span class="dim">awaiting deployment…</span></div>
+          </section>
+        </div>
+
+        <section class="card panel">
+          <div class="panel-head">
+            <div><h2>Hosting registry</h2><p class="panel-sub">Where every app currently runs</p></div>
+            <span class="pill ok tiny">3 providers</span>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>App</th><th>Provider</th><th>Region</th><th>Status</th><th>Uptime</th><th>Ping</th><th>Version</th><th></th></tr></thead>
+              <tbody id="hostBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <!-- ================= LIVE DEBUGGER ================= -->
+      <section class="view" id="view-debug" aria-label="Live debugger">
+        <div class="metrics metrics-4">
+          <article class="card metric compact">
+            <div class="metric-head"><span class="metric-label">Open findings</span><span class="metric-glyph rose">!</span></div>
+            <div class="metric-value"><span id="openFindings">5</span></div>
+            <div class="metric-foot"><span class="delta">2 high · 2 medium · 1 low</span></div>
+          </article>
+          <article class="card metric compact">
+            <div class="metric-head"><span class="metric-label">Auto-fixed today</span><span class="metric-glyph mint">✓</span></div>
+            <div class="metric-value"><span id="fixedFindings">1</span></div>
+            <div class="metric-foot"><span class="delta">zero-downtime patches</span></div>
+          </article>
+          <article class="card metric compact">
+            <div class="metric-head"><span class="metric-label">Last scan</span><span class="metric-glyph cyan">◷</span></div>
+            <div class="metric-value small" id="lastScan">2 min ago</div>
+            <div class="metric-foot"><span class="delta">every 30 min · 10 apps</span></div>
+          </article>
+          <article class="card metric compact">
+            <div class="metric-head"><span class="metric-label">Crash-free</span><span class="metric-glyph violet">◈</span></div>
+            <div class="metric-value"><span>99.2</span><span class="metric-unit">%</span></div>
+            <div class="metric-foot"><span class="delta flat">▼ 0.2% vs. 24h</span></div>
+          </article>
+        </div>
+
+        <div class="grid-debug">
+          <section class="card panel">
+            <div class="panel-head">
+              <div><h2>Findings</h2><p class="panel-sub">Runtime exceptions & static issues</p></div>
+              <button class="btn xs" id="scanBtn">Run scan</button>
+            </div>
+            <div class="findings" id="findingsList"></div>
+          </section>
+
+          <section class="card panel chart-panel">
+            <div class="panel-head">
+              <div><h2>Live performance</h2><p class="panel-sub">Aggregate across the app array</p></div>
+              <div class="legend">
+                <span><i class="dot cyan"></i>CPU</span>
+                <span><i class="dot violet"></i>Memory</span>
+              </div>
+            </div>
+            <div class="chart-box"><canvas id="perfChart" height="150" aria-label="Simulated CPU and memory usage chart"></canvas></div>
+            <div class="chart-readout">
+              <div><span>CPU</span><strong id="cpuNow">—</strong></div>
+              <div><span>Memory</span><strong id="memNow">—</strong></div>
+              <div><span>Error rate</span><strong class="mint">0.08%</strong></div>
+              <div><span>p95</span><strong>240 ms</strong></div>
+            </div>
+          </section>
+        </div>
+
+        <section class="card panel">
+          <div class="panel-head">
+            <div><h2>Load simulator</h2><p class="panel-sub">Virtual users against the current build</p></div>
+            <span class="pill" id="stressStatus">pass</span>
+          </div>
+          <div class="stress">
+            <div class="stress-left">
+              <div class="stress-value"><span id="stressUsers">25,000</span><small>virtual users</small></div>
+              <input type="range" id="stressRange" min="0" max="100" value="47" aria-label="Simulated concurrent users">
+              <div class="stress-scale"><span>1K</span><span>10K</span><span>100K</span><span>1M</span></div>
+            </div>
+            <div class="stress-right">
+              <div class="gauge"><span>p95 latency</span><strong id="stressLatency">305 ms</strong><div class="meter"><i id="latencyMeter" style="width:26%"></i></div></div>
+              <div class="gauge"><span>Projected error rate</span><strong id="stressErrors">0.00%</strong><div class="meter rose"><i id="errorMeter" style="width:2%"></i></div></div>
+              <p class="fine" id="stressNote">Estimated from a synthetic load model — not a real benchmark.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- ================= AEGIS SHIELD ================= -->
+      <section class="view" id="view-shield" aria-label="Aegis shield security">
+        <div class="grid-shield">
+          <section class="card panel radar-panel">
+            <div class="panel-head">
+              <div><h2>Threat radar</h2><p class="panel-sub">Inbound probes · last 60 s</p></div>
+              <span class="pill sim tiny">SIM</span>
+            </div>
+            <div class="radar" id="radar">
+              <div class="radar-ring r1"></div><div class="radar-ring r2"></div><div class="radar-ring r3"></div>
+              <div class="radar-cross"></div>
+              <div class="radar-sweep"></div>
+              <div class="radar-core"></div>
+              <span class="radar-n">N</span><span class="radar-e">E</span><span class="radar-s">S</span><span class="radar-w">W</span>
+              <div id="blips"></div>
+            </div>
+            <div class="map-stats">
+              <div><span>Probes / min</span><strong>1,284</strong></div>
+              <div><span>Blocked</span><strong class="mint">100%</strong></div>
+              <div><span>Open incidents</span><strong id="openIncidents">0</strong></div>
+            </div>
+          </section>
+
+          <div class="shield-side">
+            <section class="card panel posture">
+              <div class="posture-top">
+                <div>
+                  <h2>Security posture</h2>
+                  <p class="panel-sub">Composite demo score</p>
+                </div>
+                <span class="pill ok">hardened</span>
+              </div>
+              <div class="posture-body">
+                <div class="score-ring">
+                  <svg viewBox="0 0 120 120" width="120" height="120" aria-label="Security score 94 out of 100">
+                    <defs>
+                      <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4ade80"/><stop offset="1" stop-color="#38d9ff"/></linearGradient>
+                    </defs>
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(120,180,255,.12)" stroke-width="7"/>
+                    <circle id="scoreArc" cx="60" cy="60" r="50" fill="none" stroke="url(#scoreGrad)" stroke-width="7" stroke-linecap="round"
+                      stroke-dasharray="295 314" transform="rotate(-90 60 60)"/>
+                  </svg>
+                  <div class="score-num"><strong id="scoreValue">94</strong><span>/100</span></div>
+                </div>
+                <div class="posture-facts">
+                  <div><span>Blocked today</span><strong>47</strong></div>
+                  <div><span>Auto-migrations</span><strong id="migrationCount">1</strong></div>
+                  <div><span>Open CVEs</span><strong class="amber">2</strong></div>
+                  <div><span>Secrets rotated</span><strong>6 h ago</strong></div>
+                </div>
+              </div>
+              <button class="btn danger wide" id="attackBtn">Simulate intrusion</button>
+              <p class="fine">Runs a choreographed demo. No real infrastructure is touched.</p>
+            </section>
+
+            <section class="card panel migration" id="migrationCard">
+              <div class="panel-head">
+                <div><h2>Auto-migration</h2><p class="panel-sub" id="migrationRoute">idle · no active move</p></div>
+                <span class="pill" id="migrationStatus">standby</span>
+              </div>
+              <div class="mig-steps" id="migSteps">
+                <div class="mig-step" data-mig="0"><span>1</span><strong>Detect</strong><small>anomaly</small></div>
+                <div class="mig-step" data-mig="1"><span>2</span><strong>Isolate</strong><small>blast radius</small></div>
+                <div class="mig-step" data-mig="2"><span>3</span><strong>Snapshot</strong><small>encrypt data</small></div>
+                <div class="mig-step" data-mig="3"><span>4</span><strong>Reroute</strong><small>new node</small></div>
+                <div class="mig-step" data-mig="4"><span>5</span><strong>Destroy</strong><small>old host</small></div>
+              </div>
+              <p class="mig-note" id="migNote">Moves are orchestrated manually in this demo. Real active-active failover must be built, tested and load-shed, not assumed.</p>
+            </section>
+          </div>
+        </div>
+
+        <section class="card panel">
+          <div class="panel-head">
+            <div><h2>Threat log</h2><p class="panel-sub">Synthetic events · last 24 h</p></div>
+            <span class="pill tiny" id="threatCount">4 events</span>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Time</th><th>Event</th><th>Source</th><th>Target</th><th>Action</th><th>State</th></tr></thead>
+              <tbody id="threatBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card panel">
+          <div class="panel-head">
+            <div><h2>Hardening checks</h2><p class="panel-sub">Illustrative checks, not a real audit</p></div>
+            <span class="pill warn tiny">2 warnings</span>
+          </div>
+          <div class="check-grid" id="checkGrid">
+            <div class="check"><span class="check-ic ok">✓</span><div><strong>TLS 1.3 everywhere</strong><small>HSTS preload · certs auto-renew</small></div></div>
+            <div class="check"><span class="check-ic ok">✓</span><div><strong>WAF rules active</strong><small>OWASP CRS · rate limits</small></div></div>
+            <div class="check"><span class="check-ic warn">!</span><div><strong>2 dependency CVEs</strong><small>medium · patch window open</small></div></div>
+            <div class="check"><span class="check-ic ok">✓</span><div><strong>Secrets rotation</strong><small>every 24 h · vault-backed</small></div></div>
+            <div class="check"><span class="check-ic ok">✓</span><div><strong>Least-privilege IAM</strong><small>service accounts scoped</small></div></div>
+            <div class="check"><span class="check-ic warn">!</span><div><strong>Debug endpoints exposed</strong><small>staging only · restrict</small></div></div>
+          </div>
+        </section>
+      </section>
+
+      <!-- ================= ANALYTICS ================= -->
+      <section class="view" id="view-analytics" aria-label="Analytics and reports">
+        <div class="metrics metrics-4">
+          <article class="card metric compact">
+            <div class="metric-head"><span class="metric-label">Downloads · 24h</span><span class="metric-glyph">↓</span></div>
+            <div class="metric-value"><span>18,420</span></div>
+            <div class="metric-foot"><span class="delta up">▲ 12.4%</span></div>
+          </article>
+          <article class="card metric compact">
+            <div class="metric-head"><span class="metric-label">New reviews</span><span class="metric-glyph mint">★</span></div>
+            <div class="metric-value"><span>1,286</span></div>
+            <div class="metric-foot"><span class="delta up">4.4 avg rating</span></div>
+          </article>
+          <article class="card metric compact">
+            <div class="metric-head"><span class="metric-label">Crash-free</span><span class="metric-glyph violet">◈</span></div>
+            <div class="metric-value"><span>99.2</span><span class="metric-unit">%</span></div>
+            <div class="metric-foot"><span class="delta flat">1,042 sessions lost</span></div>
+          </article>
+          <article class="card metric compact">
+            <div class="metric-head"><span class="metric-label">Negative reviews</span><span class="metric-glyph rose">▼</span></div>
+            <div class="metric-value"><span>147</span></div>
+            <div class="metric-foot"><span class="delta flat">8.4% of total</span></div>
+          </article>
+        </div>
+
+        <div class="grid-analytics">
+          <section class="card panel">
+            <div class="panel-head">
+              <div><h2>Downloads · 7 days</h2><p class="panel-sub">All apps combined · simulated</p></div>
+              <div class="legend"><span><i class="dot cyan"></i>Installs</span></div>
+            </div>
+            <div class="bars" id="downloadBars"></div>
+            <div class="chart-readout">
+              <div><span>7-day total</span><strong>113,600</strong></div>
+              <div><span>Best day</span><strong>Sunday</strong></div>
+              <div><span>Avg / day</span><strong>16,229</strong></div>
+              <div><span>Growth</span><strong class="mint">+9.6%</strong></div>
+            </div>
+          </section>
+
+          <section class="card panel">
+            <div class="panel-head"><div><h2>Review sentiment</h2><p class="panel-sub">NLP pass over 1,286 reviews</p></div></div>
+            <div class="donut-wrap">
+              <svg viewBox="0 0 140 140" width="150" height="150" aria-label="Sentiment: 78% positive, 14% neutral, 8% negative">
+                <g transform="rotate(-90 70 70)">
+                  <circle cx="70" cy="70" r="52" fill="none" stroke="rgba(120,180,255,.10)" stroke-width="14"/>
+                  <circle cx="70" cy="70" r="52" fill="none" stroke="#4ade80" stroke-width="14" stroke-linecap="butt" stroke-dasharray="254.8 326.7" stroke-dashoffset="0"/>
+                  <circle cx="70" cy="70" r="52" fill="none" stroke="#64748b" stroke-width="14" stroke-dasharray="45.7 326.7" stroke-dashoffset="-254.8"/>
+                  <circle cx="70" cy="70" r="52" fill="none" stroke="#fb7185" stroke-width="14" stroke-dasharray="26.1 326.7" stroke-dashoffset="-300.5"/>
+                </g>
+                <text x="70" y="67" text-anchor="middle" class="donut-big">4.4</text>
+                <text x="70" y="84" text-anchor="middle" class="donut-small">avg rating</text>
+              </svg>
+              <ul class="donut-legend">
+                <li><i class="dot mint"></i>Positive <strong>78%</strong></li>
+                <li><i class="dot slate"></i>Neutral <strong>14%</strong></li>
+                <li><i class="dot rose"></i>Negative <strong>8%</strong></li>
+              </ul>
+            </div>
+          </section>
+        </div>
+
+        <div class="grid-analytics">
+          <section class="card panel">
+            <div class="panel-head">
+              <div><h2>Complaint themes</h2><p class="panel-sub">Why users leave bad reviews</p></div>
+              <span class="pill rose tiny">147 negative</span>
+            </div>
+            <div class="themes" id="themes"></div>
+          </section>
+
+          <section class="card panel">
+            <div class="panel-head">
+              <div><h2>Crash reports</h2><p class="panel-sub">Top clusters · last 24 h</p></div>
+              <span class="pill warn tiny">3 clusters</span>
+            </div>
+            <div class="crashes">
+              <div class="crash">
+                <div class="crash-head"><strong>NullPointerException</strong><span class="pill rose tiny">high</span></div>
+                <p>LoginScreen.jsx:84 · LedgerPay · Android 12</p>
+                <code>TypeError: cannot read 'otpToken' of undefined</code>
+                <div class="crash-meta"><span>412 events</span><span>0.31% of sessions</span><span>2 h ago</span></div>
+              </div>
+              <div class="crash">
+                <div class="crash-head"><strong>Memory growth on player mount</strong><span class="pill amber tiny">medium</span></div>
+                <p>StreamPlayer.tsx:212 · StreamBox · iOS 17</p>
+                <code>listener leak: 'timeupdate' never removed</code>
+                <div class="crash-meta"><span>188 events</span><span>0.14% of sessions</span><span>5 h ago</span></div>
+              </div>
+              <div class="crash">
+                <div class="crash-head"><strong>Frame drops on home feed</strong><span class="pill tiny">low</span></div>
+                <p>HomeFeed.tsx:49 · PulseChat · low-end Android</p>
+                <code>layout thrash: 41 reflows in one scroll</code>
+                <div class="crash-meta"><span>96 events</span><span>0.07% of sessions</span><span>9 h ago</span></div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <section class="card panel report-cta">
+          <div>
+            <h2>24-hour admin report</h2>
+            <p class="panel-sub">Downloads, sentiment, security history and crash digest — compiled from the demo dataset.</p>
+          </div>
+          <div class="report-actions">
+            <span class="pill sim tiny">demo data</span>
+            <button class="btn" id="previewReport">Preview</button>
+            <button class="btn primary" id="downloadReport">Download CSV</button>
+          </div>
+        </section>
+      </section>
+
+      <!-- ================= CLOUD REGISTRY ================= -->
+      <section class="view" id="view-settings" aria-label="Cloud registry">
+        <div class="providers" id="providers"></div>
+
+        <div class="grid-two">
+          <section class="card panel">
+            <div class="panel-head">
+              <div><h2>Credentials</h2><p class="panel-sub">Demo only — nothing is stored</p></div>
+              <span class="pill warn tiny">not connected</span>
+            </div>
+            <div class="field"><label for="gcpKey">GCP service-account JSON</label><input id="gcpKey" type="text" value="••••••••••••-demo-key-not-real" readonly></div>
+            <div class="field"><label for="azKey">Azure subscription key</label><input id="azKey" type="text" value="••••••••••••-demo-key-not-real" readonly></div>
+            <div class="field"><label for="awsKey">AWS access key ID</label><input id="awsKey" type="text" value="AKIA••••••••DEMO" readonly></div>
+            <p class="fine">A real build would use short-lived OIDC tokens held in a secret manager — never keys in the browser.</p>
+          </section>
+
+          <section class="card panel">
+            <div class="panel-head"><div><h2>Automation flags</h2><p class="panel-sub">Applies to the simulated engine</p></div></div>
+            <div class="flag-list">
+              <label class="switch"><input type="checkbox" checked data-flag="autofix"><span class="track"></span><span>Auto-fix low-risk findings</span></label>
+              <label class="switch"><input type="checkbox" checked data-flag="migrate"><span class="track"></span><span>Auto-migration on critical alert</span></label>
+              <label class="switch"><input type="checkbox" checked data-flag="waf"><span class="track"></span><span>WAF challenge mode</span></label>
+              <label class="switch"><input type="checkbox" checked data-flag="report"><span class="track"></span><span>Daily 06:00 report</span></label>
+              <label class="switch"><input type="checkbox" data-flag="canary"><span class="track"></span><span>Canary deploys</span></label>
+            </div>
+            <div class="fine" style="margin-top:14px">Toggles are stored in memory for this session and reset on reload.</div>
+          </section>
+        </div>
+
+        <section class="card panel danger-zone">
+          <div>
+            <h2>Danger zone</h2>
+            <p class="panel-sub">Reset all simulated state — apps, findings, threats and logs.</p>
+          </div>
+          <button class="btn danger" id="resetDemo">Reset demo</button>
+        </section>
+
+        <p class="footnote">Nexus Core is a front-end demonstration. It does not connect to Google Cloud, Microsoft Azure or AWS, does not deploy code, and cannot guarantee that any app is “unhackable”. Server-hopping is not a security control — real resilience needs defence in depth, backups you have tested, and an incident plan.</p>
+      </section>
+
+
+      <!-- ================= AI GATEWAY ================= -->
+      <section class="view" id="view-gateway" aria-label="AI gateway and evaluations">
+        <div class="gateway-intro card">
+          <div><div class="gateway-eyebrow">INTELLIGENCE LAYER / 01</div><h2>One gateway. Smarter decisions.</h2><p>Route requests, inspect reliability and test agent performance across three policies.</p></div>
+          <span class="pill warn">● Local simulation · no provider connected</span>
+        </div>
+        <div class="gateway-metrics">
+          <article class="card gateway-stat"><span>REQUESTS</span><strong id="gwRequests">0</strong><small>this session</small></article>
+          <article class="card gateway-stat"><span>EST. COST</span><strong id="gwCost">$0.0000</strong><small>illustrative mock rates</small></article>
+          <article class="card gateway-stat"><span>CACHE HITS</span><strong id="gwHits">0</strong><small>exact request repeats</small></article>
+          <article class="card gateway-stat"><span>FALLBACKS</span><strong id="gwFallbacks">0</strong><small>successful simulated failovers</small></article>
+        </div>
+        <div class="gateway-grid">
+          <section class="card panel">
+            <div class="panel-head"><div><div class="gateway-eyebrow">01 / REQUEST LAB</div><h2>Gateway playground</h2><p class="panel-sub">Try a simulated request and see the routing decision.</p></div><span class="pill cy tiny">MOCK MODE</span></div>
+            <form id="gwForm">
+              <div class="field"><label for="gwPrompt">Request</label><textarea id="gwPrompt" rows="4" maxlength="4000" placeholder="e.g. Explain how to debug an authentication error" required></textarea></div>
+              <div class="gateway-form-row"><div class="field"><label for="gwPolicy">Routing policy</label><select id="gwPolicy"><option value="router">Smart router</option><option value="cheap">Always cheap</option><option value="strong">Always strong</option></select></div><div class="field"><label for="gwFailure">Simulate provider failure</label><select id="gwFailure"><option value="none">No failure</option><option value="recover">Retry succeeds</option><option value="fallback">Retry fails → fallback</option><option value="all">All providers fail</option></select></div></div>
+              <div class="gateway-actions"><label class="gateway-check"><input type="checkbox" id="gwCache" checked> Cache exact repeats</label><button class="btn primary" type="submit">Send request ↗</button></div>
+            </form>
+            <div id="gwResponse" class="gateway-response" aria-live="polite"><span>Response &amp; route details will appear here.</span></div>
+            <p class="fine">This playground does not generate AI answers. It simulates routing, retries, cache and fallback locally; no API keys or prompts are sent anywhere.</p>
+          </section>
+          <section class="card panel">
+            <div class="panel-head"><div><div class="gateway-eyebrow">02 / ROUTING LOGIC</div><h2>How requests flow</h2><p class="panel-sub">Transparent rules, not a black box.</p></div></div>
+            <div class="gateway-flow"><div><b>01</b><span><strong>Inspect request</strong><small>Code, complexity keywords and prompt length.</small></span></div><div><b>02</b><span><strong>Choose a model</strong><small>Simple → mock cheap · complex → mock strong.</small></span></div><div><b>03</b><span><strong>Retry &amp; fall back</strong><small>One simulated retry, then the alternate mock model.</small></span></div><div><b>04</b><span><strong>Record the trace</strong><small>Route reason, token estimates, latency and cost.</small></span></div></div>
+            <div class="gateway-note"><strong>Estimated pricing</strong><p>Mock cheap: $0.10 / 1M input, $0.20 / 1M output tokens. Mock strong: $1 / 1M input, $2 / 1M output tokens. These are illustrative, not real provider prices.</p></div>
+          </section>
+        </div>
+        <section class="card panel gateway-section">
+          <div class="panel-head"><div><div class="gateway-eyebrow">03 / AGENT EVALUATION</div><h2>Compare policies on the same exam</h2><p class="panel-sub">20 fixed tasks · calculator &amp; lookup tools · answer, tool and step checks</p></div><button class="btn primary" id="gwRunEval">Run evaluation ↗</button></div>
+          <div class="gateway-eval-explainer"><span>① Same task set</span><span>→</span><span>② Mock agent + tools</span><span>→</span><span>③ Score &amp; compare</span></div>
+          <div id="gwEvalResults" class="gateway-empty">No evaluation run yet. Run the exam to compare pass rates and illustrative costs.</div>
+          <div id="gwEvalDetails"></div>
+          <p class="fine">Deterministic mock agent: the cheap model intentionally fails some complex tasks. Scores and costs demonstrate the workflow, not real model performance. Replace mocks with real providers and independently designed evals before making claims.</p>
+        </section>
+        <section class="card panel gateway-section">
+          <div class="panel-head"><div><div class="gateway-eyebrow">04 / OBSERVABILITY</div><h2>Request log</h2><p class="panel-sub">Local session only · prompt text is not recorded</p></div><div class="gateway-actions"><button class="btn xs ghost" id="gwExport">Export CSV</button><button class="btn xs ghost" id="gwClear">Clear log</button></div></div>
+          <div class="gateway-table-wrap"><table class="gateway-table"><thead><tr><th>TIME</th><th>POLICY / REASON</th><th>MODEL</th><th>TOKENS IN / OUT</th><th>LATENCY</th><th>EST. COST</th><th>STATUS</th></tr></thead><tbody id="gwLog"><tr><td colspan="7" class="gateway-empty">No requests yet. Send one from the playground.</td></tr></tbody></table></div>
+        </section>
+        <p class="footnote">Prototype only. No real LLM, HTTP gateway, external provider, database or production agent is connected. Logs and cache are held in memory and cleared on reload. Never enter secrets or sensitive information.</p>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============ TOASTS ============ -->
+<div class="toast-wrap" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-backdrop" id="modalBackdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <h3 id="modalTitle">Title</h3>
+      <button class="icon-btn" id="modalClose" aria-label="Close dialog">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+
+<noscript><p style="padding:24px;color:#cfe3ff">This dashboard needs JavaScript to render its simulated data.</p></noscript>
+
+<script src="app.js"></script>
+<script src="ai-gateway.js"></script>
+</body>
+</html>
